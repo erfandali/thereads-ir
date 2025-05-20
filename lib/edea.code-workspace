@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../threads_test-main/lib"
+		}
+	],
+	"settings": {}
+}
