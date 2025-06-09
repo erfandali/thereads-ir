@@ -53,9 +53,9 @@ class _EditPostPageState extends State<EditPostPage> {
         MaterialPageRoute(
           builder: (context) => ImageEditorPage(
             image: File(image.path),
-            onImageEdited: (image) {
+            onImageEdited: (imageCropped) {
               setState(() {
-                _selectedImage = image;
+                _selectedImage = imageCropped;
                 _selectedVideo = null;
                 _recordedAudio = null;
               });
@@ -89,13 +89,13 @@ class _EditPostPageState extends State<EditPostPage> {
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      Navigator.of(context).push(
+    await  Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ImageEditorPage(
             image: File(image.path),
-            onImageEdited: (image) {
+            onImageEdited: (imageCropped) {
               setState(() {
-                _selectedImage = image;
+                 _selectedImage = imageCropped;
                 _selectedVideo = null;
                 _recordedAudio = null;
               });

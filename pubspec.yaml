@@ -28,6 +28,7 @@ dependencies:
   provider: ^6.1.5
   ffmpeg_kit_flutter_new: ^1.6.1
   #ffmpeg_kit_flutter_min: ^6.0.3
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:

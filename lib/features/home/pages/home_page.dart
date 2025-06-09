@@ -27,33 +27,39 @@ class HomePage extends StatelessWidget {
         ),
         body: SafeArea(
           child: Consumer<PostProvider>(
-            builder: (context, postProvider, child) => ScrollableColumn(
-              spacing: 2,
-              children: List.generate(
-                postProvider.posts.length,
-                (index) => FutureBuilder(
-                    future: postProvider.posts[index],
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return SizedBox(
-                          width: double.infinity,
-                          height: 250,
-                          child: Center(child: CircularProgressIndicator()),
+            builder: (context, postProvider, child) => 
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[700]
+                  ),
+              child: ScrollableColumn(
+                spacing: 1,
+                children: List.generate(
+                  postProvider.posts.length,
+                  (index) => FutureBuilder(
+                      future: postProvider.posts[index],
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return SizedBox(
+                            width: double.infinity,
+                            height: 250,
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+              
+                        Post post = snapshot.data ??
+                            Post.fromUrl(
+                              user: FakeData.currentUser,
+                              text: 'error',
+                              createdAt: DateTime.now(),
+                            ) as Post;
+              
+                        return PostCards(
+                          post: post,
+                          editable: index == 0,
                         );
-                      }
-
-                      Post post = snapshot.data ??
-                          Post.fromUrl(
-                            user: FakeData.currentUser,
-                            text: 'error',
-                            createdAt: DateTime.now(),
-                          ) as Post;
-
-                      return PostCards(
-                        post: post,
-                        editable: index == 0,
-                      );
-                    }),
+                      }),
+                ),
               ),
             ),
           ),

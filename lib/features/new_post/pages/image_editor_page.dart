@@ -1,11 +1,22 @@
 import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_cropper/image_cropper.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/models/my_aspect_ratio.dart';
 
 import '../widgets/aspect_ratio_container.dart';
+
+class CropAspectRatioPresetCustom implements CropAspectRatioPresetData {
+  @override
+  (int, int)? get data => (2, 3);
+
+  @override
+  String get name => '2x3 (customized)';
+}
+
 
 class ImageEditorPage extends StatefulWidget {
   const ImageEditorPage({
@@ -15,7 +26,7 @@ class ImageEditorPage extends StatefulWidget {
   });
 
   final File image;
-  final Function(File image) onImageEdited;
+  final Function(File imageCroped) onImageEdited;
 
   @override
   State<ImageEditorPage> createState() => _ImageEditorPageState();
@@ -23,17 +34,80 @@ class ImageEditorPage extends StatefulWidget {
 
 class _ImageEditorPageState extends State<ImageEditorPage> {
   MyAspectRatio? selectedAspecRatio;
-  late File image;
+  late File imageTempFile;
+  bool isLoading = false;
+  bool userCropImage=false;
 
   @override
   void initState() {
     super.initState();
-    image = widget.image;
+    imageTempFile = widget.image;
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<File?> _autoCropTo916(File imageFile) async {
+    try {
+      final Uint8List imageBytes = await imageFile.readAsBytes();
+      img.Image? originalImage = img.decodeImage(imageBytes);
+
+      if (originalImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Could not decode image")));
+        setState(() { isLoading = false; });
+        return null;
+      }
+
+      int originalWidth = originalImage.width;
+      int originalHeight = originalImage.height;
+      double targetAspectRatio = 9.0 / 16.0;
+
+      int cropWidth;
+      int cropHeight;
+
+      // Determine the largest 9:16 rectangle that fits
+      if (originalWidth / originalHeight > targetAspectRatio) {
+        // Original is wider than target, so height is the limiting dimension
+        cropHeight = originalHeight;
+        cropWidth = (originalHeight * targetAspectRatio).round();
+      } else {
+        // Original is taller than or equal to target, so width is the limiting dimension
+        cropWidth = originalWidth;
+        cropHeight = (originalWidth / targetAspectRatio).round();
+      }
+
+      // Calculate top-left corner for center cropping
+      int offsetX = ((originalWidth - cropWidth) / 2).round();
+      int offsetY = ((originalHeight - cropHeight) / 2).round();
+
+      img.Image croppedImage = img.copyCrop(
+        originalImage,
+        x: offsetX,
+        y: offsetY,
+        width: cropWidth,
+        height: cropHeight,
+      );
+
+      //Save the cropped image to a temporary file
+     final tempDir = await getTemporaryDirectory();
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      try {
+        await imageFile.delete();
+      }catch(e){}
+      final File tempFile = File('${tempDir.path}/cropped_$timestamp.jpg');
+      await tempFile.writeAsBytes(img.encodeJpg(croppedImage, quality: 100));
+      await Future.delayed(Duration(milliseconds: 300));
+      return tempFile;
+    } catch (e) {
+      print("Error during auto-crop: $e");
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error auto-cropping: $e")));
+      setState(() { isLoading = false; });
+      return null;
+    }
   }
 
   Future<File?> cropImage(File file, MyAspectRatio aspectRatio) async {
@@ -44,15 +118,30 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
           ratioX: aspectRatio.xAspect.toDouble(),
           ratioY: aspectRatio.yAspect.toDouble(),
         ),
+        compressQuality: 100,
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'کراپ عکس',
             toolbarColor: Colors.black,
             toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
             activeControlsWidgetColor: Theme.of(context).colorScheme.primary,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: true,
-            hideBottomControls: false,
+            lockAspectRatio: false,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPresetCustom(),
+            ],
+          ),
+          IOSUiSettings(
+            title: 'کراپ عکس',
+            aspectRatioPresets: [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPresetCustom(),
+            ],
           ),
         ],
       );
@@ -67,16 +156,33 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
     final cropped = await cropImage(widget.image, aspectRatio);
 
     if (cropped != null) {
-      image = cropped;
-      selectedAspecRatio = aspectRatio;
-
-      setState(() {});
+     
+      setState(() {
+        imageTempFile = cropped;
+        selectedAspecRatio = aspectRatio;
+        userCropImage=true;
+      });
     }
   }
 
   void _exportImage() async {
-    widget.onImageEdited(image);
-
+    if (userCropImage)
+      {
+        widget.onImageEdited(imageTempFile);
+      }else {
+      setState(() {
+        isLoading = true;
+      });
+      File? cropped916 = await _autoCropTo916(widget.image);
+      if (cropped916 != null && cropped916.path.isNotEmpty){
+      print("_exportImage = ${imageTempFile.path}");
+      widget.onImageEdited(cropped916);
+    }else{
+        setState(() { isLoading = false; });
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error auto-cropping, Please select other picture")));
+      }
+    }
     Navigator.of(context).pop();
   }
 
@@ -95,7 +201,7 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.6,
                   child: Image.file(
-                    image,
+                    imageTempFile,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -113,9 +219,15 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
                         ),
                         IconButton(
                           onPressed: _exportImage,
-                          icon: Icon(
-                            Icons.done_rounded,
-                          ),
+                          icon:
+                          ((isLoading)?
+                          SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: const CircularProgressIndicator())
+                              :
+                          const Icon(Icons.done_rounded))
+                          ,
                         ),
                       ],
                     ),
