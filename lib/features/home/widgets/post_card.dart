@@ -176,12 +176,12 @@ class _PostCardsState extends State<PostCards> {
                                     if (!isExpanded &&
                                         widget.post.text!.length > 100)
                                       const TextSpan(
-                                          text: " more... ",
+                                          text: " بیشتر... ",
                                           style:
                                               TextStyle(color: Colors.white60)),
                                     if (isExpanded)
                                       const TextSpan(
-                                          text: " less ",
+                                          text: " کمتر ",
                                           style:
                                               TextStyle(color: Colors.white38)),
                                   ],
