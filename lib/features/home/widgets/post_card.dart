@@ -301,93 +301,27 @@ class _PostCardsState extends State<PostCards> {
                                       fontSize: 13, color: Colors.white)),
                             ))
                         : const SizedBox.shrink(),
-                    Stack(
-                      children: [
-                        Container(
-                          height: 30,
-                          width: 170,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                              ),
-                            ],
+                    InkWell(
+                      onTap: (){
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => EditPostPage(
+                              post: widget.post,
+                            ),
                           ),
+                        );
+                      },
+                      child: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          border: Border.all(color: Colors.white30),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 32,
-                              width: 150,
-                              child: Stack(
-                                children: [
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children:
-                                          widget.post.emojies.map((emoji) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4, vertical: 7),
-                                          child: EmojiBubble(emoji: emoji),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 0,
-                                    top: 0,
-                                    bottom: 0,
-                                    width: 50,
-                                    child: IgnorePointer(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black,
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            InkWell(
-                              onTap: (){
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => EditPostPage(
-                                      post: widget.post,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 30,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.surface,
-                                  border: Border.all(color: Colors.white30),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(Icons.open_in_full_outlined,
-                                    color: Colors.white, size: 15),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                        child: const Icon(Icons.open_in_full_outlined,
+                            color: Colors.white, size: 15),
+                      ),
                     ),
                   ],
                 ),
