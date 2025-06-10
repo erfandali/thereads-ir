@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ddca2f8-6f23-495c-be7e-d47125eda77a" name="Changes" comment="fix: line, edit text, buttons, add outo crop" />
+    <list default="true" id="1ddca2f8-6f23-495c-be7e-d47125eda77a" name="Changes" comment="fix: remove emoji" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -135,7 +135,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749495313061</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="fix: remove emoji">
+      <option name="closed" value="true" />
+      <created>1749586213932</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1749586213932</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -149,6 +157,7 @@
     <MESSAGE value="fix: init base code to develop" />
     <MESSAGE value="fix: translate" />
     <MESSAGE value="fix: line, edit text, buttons, add outo crop" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: line, edit text, buttons, add outo crop" />
+    <MESSAGE value="fix: remove emoji" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove emoji" />
   </component>
 </project>

@@ -29,8 +29,9 @@ class HomePage extends StatelessWidget {
           child: Consumer<PostProvider>(
             builder: (context, postProvider, child) => 
                 Container(
+                  // dark seprated post line
                   decoration: BoxDecoration(
-                    color: Colors.grey[700]
+                    color: Colors.grey[950]
                   ),
               child: ScrollableColumn(
                 spacing: 1,
